@@ -7,7 +7,7 @@ export function initializeTaskApi(app: Express) {
     app.post('/task/register_action', (response, request) => {
         Authenticator.getInstance().verifyRequest(response, request, handleRegisterActionRequest);
     });
-    app.post('/task/get_snapshot', (response, request) => {
+    app.get('/task/get_snapshot', (response, request) => {
         Authenticator.getInstance().verifyRequest(response, request, handleGetSnapshotRequest);
     });
 }
