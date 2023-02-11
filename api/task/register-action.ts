@@ -43,8 +43,10 @@ export async function handleRequest(request: Request, response: Response) {
     let result = await storage.TaskRepository?.registerAction(data.userId, data.actionType, data.actionPayload);
 
     if (result) {
+        response.status(200).send();
         console.log("[RegisterAction] Successfully registered action.");
     } else {
+        response.status(500).send();
         console.warn(`[RegisterAction] Failed to register action.
          { userId: '${data.userId}', actionType: '${data.actionType}', actionPayload: '${data.actionPayload}`);
     }
