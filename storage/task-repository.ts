@@ -2,6 +2,7 @@ import { Task } from "../core/task";
 import { TaskActionType } from "../core/task-action-type";
 import { Client } from "ts-postgres";
 import { TaskCollection } from "../core/task-collection";
+import { RegisterActionPayload } from "../core/register-action-payload";
 
 type PostgresPrimitive = string | number | bigint | boolean | Object | undefined;
 
@@ -10,16 +11,9 @@ export class TaskRepository {
 
     }
 
-    public async registerAction(userId: string, actionType: TaskActionType, actionPayload: string): Promise<boolean> {
+    public async registerActions(userId: string, payload: RegisterActionPayload[]): Promise<boolean> {
         try {
-            let query = `INSERT INTO USER_ACTIONS (USER_ID, ACTION_TYPE, ACTION_PAYLOAD) 
-            VALUES ('${userId}', ${actionType}, '${actionPayload}')`;
-
-            let taskId = JSON.parse(actionPayload).taskId;
-            if (taskId) {
-                query = `INSERT INTO USER_ACTIONS (USER_ID, TASK_ID, ACTION_TYPE, ACTION_PAYLOAD) 
-                VALUES ('${userId}', '${taskId}', ${actionType}, '${actionPayload}')`;
-            }
+            let query = this.generateInsertsFromRegisterPayloads(userId, payload);
 
             await this.client.query(query);
 
@@ -28,6 +22,23 @@ export class TaskRepository {
             console.error(error);
             return false;
         }
+    }
+
+    private generateInsertsFromRegisterPayloads(userId: string, payload: RegisterActionPayload[]): string {
+        let query = "";
+
+        for (let action of payload) {
+            let taskId = JSON.parse(action.payload).taskId;
+            if (taskId) {
+                query += `INSERT INTO USER_ACTIONS (USER_ID, TASK_ID, ACTION_TYPE, ACTION_PAYLOAD) 
+                VALUES ('${userId}', '${taskId}', ${action.action}, '${action.payload}');`;
+            } else {
+                query += `INSERT INTO USER_ACTIONS (USER_ID, ACTION_TYPE, ACTION_PAYLOAD) 
+                VALUES ('${userId}', ${action.action}, '${action.payload}');`;
+            }
+        }
+
+        return query;
     }
 
     public async getSnapshot(userId: string): Promise<Task[]> {
