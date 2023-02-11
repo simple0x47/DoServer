@@ -14,6 +14,12 @@ export class TaskCollection {
     }
 
     public toggleStatus(taskId: string) {
+        let task = this.tasks.get(taskId);
+
+        if (!task) {
+            this.create(taskId);
+        }
+
         this.tasks.get(taskId)?.toggleStatus();
     }
 
@@ -21,10 +27,10 @@ export class TaskCollection {
         let task = this.tasks.get(taskId);
 
         if (!task) {
-            return;
+            this.create(taskId);
         }
 
-        task.Description = description;
+        this.tasks.get(taskId)!.Description = description;
     }
 
     public clearDone() {
