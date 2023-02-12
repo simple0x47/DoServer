@@ -46,6 +46,7 @@ export class Authenticator {
                 callback(null, signingKey);
             })
         }, {}, function (err, decoded) {
+            console.log("verify error: " + err);
             if (!decoded) {
                 console.log("decoded token is undefined");
                 response.status(403).send();
