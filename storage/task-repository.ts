@@ -13,9 +13,11 @@ export class TaskRepository {
 
     public async registerActions(userId: string, payload: RegisterActionPayload[]): Promise<boolean> {
         try {
-            let query = this.generateInsertsFromRegisterPayloads(userId, payload);
+            let queries = this.generateInsertsFromRegisterPayloads(userId, payload);
 
-            await this.client.query(query);
+            for (let query of queries) {
+                await this.client.query(query);
+            }
 
             return true;
         } catch (error) {
@@ -24,21 +26,27 @@ export class TaskRepository {
         }
     }
 
-    private generateInsertsFromRegisterPayloads(userId: string, payload: RegisterActionPayload[]): string {
-        let query = "";
-
+    private generateInsertsFromRegisterPayloads(userId: string, payload: RegisterActionPayload[]): string[] {
+        let queries: string[] = [];
+        let i = 0;
         for (let action of payload) {
+            if (!action) {
+                continue;
+            }
+
             let taskId = JSON.parse(action.payload).taskId;
             if (taskId) {
-                query += `INSERT INTO USER_ACTIONS (USER_ID, TASK_ID, ACTION_TYPE, ACTION_PAYLOAD) 
+                queries[i] = `INSERT INTO USER_ACTIONS (USER_ID, TASK_ID, ACTION_TYPE, ACTION_PAYLOAD) 
                 VALUES ('${userId}', '${taskId}', ${action.action}, '${action.payload}');`;
             } else {
-                query += `INSERT INTO USER_ACTIONS (USER_ID, ACTION_TYPE, ACTION_PAYLOAD) 
+                queries[i] = `INSERT INTO USER_ACTIONS (USER_ID, ACTION_TYPE, ACTION_PAYLOAD) 
                 VALUES ('${userId}', ${action.action}, '${action.payload}');`;
             }
+
+            i += 1;
         }
 
-        return query;
+        return queries;
     }
 
     public async getSnapshot(userId: string): Promise<Task[]> {
