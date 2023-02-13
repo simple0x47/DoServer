@@ -33,7 +33,6 @@ export function getRoles(request: Request, response: Response) {
             }).then(
                 rolesResponse => rolesResponse.json())
                 .then(data => {
-                    console.log("fetched data: " + data);
                     // Timeout has already been triggered.
                     if (response.closed) {
                         return;

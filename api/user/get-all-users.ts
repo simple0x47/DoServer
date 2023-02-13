@@ -57,7 +57,6 @@ async function getUsersFromAuth0JsonResponse(data: any): Promise<User[]> {
     }
 
     for (let partialUser of partialUsers) {
-        console.log("partial user: " + partialUser.user_id);
         let user = new User(partialUser.user_id, partialUser.name, partialUser.email);
 
         let storage = await StorageSingleton.getInstance();
@@ -71,8 +70,6 @@ async function getUsersFromAuth0JsonResponse(data: any): Promise<User[]> {
         for (let action of actions) {
             user.addAction(action);
         }
-
-        console.log("pushing user: " + JSON.stringify(user));
 
         users.push(user);
     }
