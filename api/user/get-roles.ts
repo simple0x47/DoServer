@@ -3,7 +3,6 @@ import fetch from "node-fetch";
 import { StorageSingleton } from "../../storage/storage-singleton";
 
 export function getRoles(request: Request, response: Response) {
-    console.log("get roles");
     if (!("id" in request.params)) {
         response.status(500).send();
         return;
@@ -44,5 +43,4 @@ export function getRoles(request: Request, response: Response) {
                 });
         }
     );
-
 }
