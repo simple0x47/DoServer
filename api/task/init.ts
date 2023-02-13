@@ -4,10 +4,10 @@ import { handleGetSnapshotRequest } from "./get-snapshot";
 import { Authenticator } from "../../authenticator";
 
 export function initializeTaskApi(app: Express) {
-    app.post('/task/register_action', (response, request) => {
-        Authenticator.getInstance().verifyRequest(response, request, handleRegisterActionRequest);
+    app.post('/task/register_action', (request, response) => {
+        Authenticator.getInstance().verifyRequest(request, response, handleRegisterActionRequest);
     });
-    app.get('/task/get_snapshot', (response, request) => {
-        Authenticator.getInstance().verifyRequest(response, request, handleGetSnapshotRequest);
+    app.get('/task/get_snapshot', (request, response) => {
+        Authenticator.getInstance().verifyRequest(request, response, handleGetSnapshotRequest);
     });
 }

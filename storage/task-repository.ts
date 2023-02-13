@@ -3,6 +3,7 @@ import { TaskActionType } from "../core/task-action-type";
 import { Client } from "ts-postgres";
 import { TaskCollection } from "../core/task-collection";
 import { RegisterActionPayload } from "../core/register-action-payload";
+import { TaskAction } from "../core/task-action";
 
 type PostgresPrimitive = string | number | bigint | boolean | Object | undefined;
 
@@ -119,5 +120,36 @@ export class TaskRepository {
                 taskCollection.clearDone();
                 break;
         }
+    }
+
+    public async getActionsForUserId(userId: string): Promise<TaskAction[]> {
+        let actions: TaskAction[] = [];
+
+        const result = this.client.query("SELECT ACTION_TYPE, ACTION_PAYLOAD, REGISTERED_AT FROM USER_ACTIONS WHERE USER_ID=$1 ORDER BY ID ASC", [userId]);
+
+        for await (let row of result) {
+            let actionType = row.get("action_type")?.valueOf();
+            let actionPayload = row.get("action_payload")?.valueOf();
+            let actionRegisteredAt = row.get("registered_at")?.valueOf();
+
+            if (actionType === undefined || (typeof actionType !== "number")) {
+                console.warn("invalid value detected for actionType");
+                continue;
+            }
+
+            if (actionPayload === undefined || (typeof actionPayload !== "object")) {
+                console.warn("invalid value detected for actionPayload");
+                continue;
+            }
+
+            if (actionRegisteredAt === undefined || (typeof actionRegisteredAt !== "number")) {
+                console.warn("invalid value detected for actionRegisteredAt");
+                continue;
+            }
+
+            actions.push(new TaskAction(actionType, JSON.stringify(actionPayload), actionRegisteredAt));
+        }
+
+        return actions;
     }
 }

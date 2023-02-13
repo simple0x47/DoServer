@@ -10,7 +10,7 @@ export class StorageSingleton {
     private auth0TokenRepository: Auth0TokenRepository;
 
     public get TaskRepository(): TaskRepository | undefined {
-        return this.taskRepository
+        return this.taskRepository;
     }
 
     public get Auth0TokenRepository(): Auth0TokenRepository {
